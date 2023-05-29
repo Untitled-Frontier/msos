@@ -6,11 +6,11 @@ pragma solidity ^0.8.12;
 
 // modified from original to take away functions that I'm not using
 
-contract SVG {
+library svg {
     /* MAIN ELEMENTS */
 
     function rect(string memory _props, string memory _children)
-        public
+        internal
         pure
         returns (string memory)
     {
@@ -18,7 +18,7 @@ contract SVG {
     }
 
     function rect(string memory _props)
-        public
+        internal
         pure
         returns (string memory)
     {
@@ -26,7 +26,7 @@ contract SVG {
     }
 
     function filter(string memory _props, string memory _children)
-        public
+        internal
         pure
         returns (string memory)
     {
@@ -40,7 +40,7 @@ contract SVG {
         string memory _tag,
         string memory _props,
         string memory _children
-    ) public pure returns (string memory) {
+    ) internal pure returns (string memory) {
         return
             string.concat(
                 '<',
@@ -59,7 +59,7 @@ contract SVG {
     function el(
         string memory _tag,
         string memory _props
-    ) public pure returns (string memory) {
+    ) internal pure returns (string memory) {
         return
             string.concat(
                 '<',
@@ -72,10 +72,20 @@ contract SVG {
 
     // an SVG attribute
     function prop(string memory _key, string memory _val)
-        public
+        internal 
         pure
         returns (string memory)
     {
         return string.concat(_key, '=', '"', _val, '" ');
+    }
+
+    function whiteRect() internal pure returns (string memory) {
+        return rect(
+            string.concat(
+                prop('width','100%'),
+                prop('height', '100%'),
+                prop('fill', 'white')
+            )
+        );
     }
 }

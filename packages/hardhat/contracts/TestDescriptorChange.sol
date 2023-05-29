@@ -12,7 +12,7 @@ Partly inspired by Zond's Flowers by onchainCo: https://opensea.io/collection/fl
 import './svg.sol';
 import './utils.sol';
 
-contract Renderer {
+contract TestDescriptorChange {
 
     function render(uint256 _tokenId, bool deluxe) internal pure returns (string memory) {
         bytes memory hash = abi.encodePacked(bytes32(_tokenId));
@@ -193,6 +193,11 @@ contract Renderer {
 
     function generateName(uint nr) public pure returns (string memory) {
         return string(abi.encodePacked('Daisychain #', utils.substring(utils.uint2str(nr),0,8)));
+    }
+
+    function generateDescription() public pure returns (string memory) {
+        string memory description = "Testing Change of Descriptor";
+        return description;
     }
     
     function generateTraits(uint256 tokenId, bool deluxe) public pure returns (string memory) {

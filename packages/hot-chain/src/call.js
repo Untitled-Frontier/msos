@@ -15,6 +15,8 @@ async function call(vm, address, abi, name, args = []) {
     data: Buffer.from(data.slice(2), 'hex'),
   });
 
+  console.log(renderResult.gasUsed.toString());
+
   if (renderResult.execResult.exceptionError) {
     console.log('err');
     console.log(renderResult.execResult);
@@ -26,7 +28,7 @@ async function call(vm, address, abi, name, args = []) {
   );
 
   if (logs?.length) {
-    // console.log(logs);
+    //console.log(logs);
   }
 
   const results = defaultAbiCoder.decode(

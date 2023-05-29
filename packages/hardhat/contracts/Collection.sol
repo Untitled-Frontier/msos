@@ -8,6 +8,11 @@ import "./utils/MerkleProof.sol";
 
 import "./CollectionDescriptor.sol";
 
+/*
+Daisychains: Life In Every Breath.
+todo: add more description
+*/
+
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
  * the Metadata extension, but not including the Enumerable extension, which is available separately as
@@ -15,7 +20,7 @@ import "./CollectionDescriptor.sol";
  */
 contract Collection is ERC721 {
 
-    address public owner = 0xaF69610ea9ddc95883f97a6a3171d52165b69B03; // for opensea integration. doesn't do anything else.
+    address public owner; // = 0xaF69610ea9ddc95883f97a6a3171d52165b69B03; // for opensea integration. doesn't do anything else.
     address payable public recipient; // in this instance, it will be a 0xSplit on mainnet
 
     CollectionDescriptor public descriptor;
@@ -24,7 +29,8 @@ contract Collection is ERC721 {
     uint256 public startDate;
     uint256 public endDate;
 
-    mapping(uint256 => bool) randomMints;
+    uint256 public deluxeBuyableSupply;
+    mapping(uint256 => bool) public deluxeIDs;
 
     // for loyal mints
     mapping (address => bool) public claimed;
@@ -34,6 +40,7 @@ contract Collection is ERC721 {
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
     constructor (string memory name_, string memory symbol_, address payable recipient_, uint256 startDate_, uint256 endDate_, bytes32 root_) ERC721(name_, symbol_) {
+        owner = msg.sender;
         descriptor = new CollectionDescriptor();
         recipient = recipient_;
         startDate = startDate_;
@@ -46,6 +53,23 @@ contract Collection is ERC721 {
         claimed[owner] = true;
     }
 
+    /*
+    Custom Code
+    */
+
+    // change descriptor (in case there's issues)
+    // only allowed by admin/owner until 1 December 2023.
+    // this is to fix potential issues or upgrade.
+    // After Dec 01 2023, it's not possible anymore.
+    function changeDescriptor(address _newDescriptor) public {
+        require(msg.sender == owner, 'not owner');
+        require(block.timestamp < 1701406800, 'cant change descriptor anymore'); //Fri Dec 01 2023 05:00:00 GMT+0000
+        descriptor = CollectionDescriptor(_newDescriptor);
+    }
+
+    /*
+    ERC721 code
+    */
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
@@ -53,7 +77,7 @@ contract Collection is ERC721 {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
         string memory name = descriptor.generateName(tokenId); 
-        string memory description = "Capsules containing visualizations of all the lives lived by simulated minds in the school of unlearning.";
+        string memory description = descriptor.generateDescription();
 
         string memory image = generateBase64Image(tokenId);
         string memory attributes = generateTraits(tokenId);
@@ -84,45 +108,44 @@ contract Collection is ERC721 {
         return Base64.encode(img);
     }
 
-    /*
-    NOTE: Calling this when the token doesn't exist will result in it being defined
-    as a "chosen seed" because randomMint will be 0 (or false) if it's not initialized.
-    */
     function generateImage(uint256 tokenId) public view returns (string memory) {
-        bool randomMint = randomMints[tokenId];
-        return descriptor.generateImage(tokenId, randomMint);
+        bool deluxe = deluxeIDs[tokenId];
+        return descriptor.generateImage(tokenId, deluxe);
     }
 
     function generateTraits(uint256 tokenId) public view returns (string memory) {
-        bool randomMint = randomMints[tokenId];
-        return descriptor.generateTraits(tokenId, randomMint);
+        bool deluxe = deluxeIDs[tokenId];
+        return descriptor.generateTraits(tokenId, deluxe);
+    }
+
+    /*FOR STATS*/
+    function generateTraitsWithSeedAndAddress(uint256 _seed, address _minter, bool deluxe) public view returns (string memory) {
+        uint256 customTokenId = uint(keccak256(abi.encodePacked(_seed, _minter))); // seed = timestamp
+        return descriptor.generateTraits(customTokenId, deluxe);
     }
 
     /*
     VM Viewers:
-    These drawing functions are used inside the browser vm to display the capsule without having to call a live network.
+    These drawing functions are used inside the browser vm to display the NFT without having to call a live network.
     */
 
     // Generally used inside the browser VM to preview a capsule for seed mints
-    function generateImageFromSeedAndAddress(uint256 _seed, address _owner) public view returns (string memory) {
+    function generateFullImageFromVM(uint256 _seed, address _owner, bool deluxe) public view returns (string memory) {
         uint256 tokenId = uint(keccak256(abi.encodePacked(_seed, _owner)));
-        return generateImage(tokenId);
-    }
-
-    // a forced random mint viewer, used when viewing in the browser vm after a successful random mint
-    function generateRandomMintImageFromTokenID(uint256 tokenId) public view returns (string memory) {
-        return descriptor.generateImage(tokenId, true);
+        return descriptor.generateImage(tokenId, deluxe);
     }
 
     /* PUBLIC MINT OPTIONS */
-    function mintWithSeed(uint256 _seed) public payable {
+    function mintDeluxe() public payable {
+        deluxeBuyableSupply+=1;
+        require(deluxeBuyableSupply <= 96, "ALL DELUXE HAS BEEN SOLD");
         require(msg.value >= 0.074 ether, "MORE ETH NEEDED"); // ~$100
-        _mint(msg.sender, _seed, false);
+        _mint(msg.sender, block.timestamp, true);
     }
 
     function mint() public payable {
         require(msg.value >= 0.022 ether, "MORE ETH NEEDED"); // ~$30
-        _mint(msg.sender, block.timestamp, true);
+        _mint(msg.sender, block.timestamp, false);
     }
 
     function loyalMint(bytes32[] calldata proof) public {
@@ -138,31 +161,37 @@ contract Collection is ERC721 {
 
         bytes32 hashedLeaf = keccak256(abi.encodePacked(leaf));
         require(MerkleProof.verify(proof, loyaltyRoot, hashedLeaf), "Invalid Proof");
-        _mint(leaf, block.timestamp, true); // mint a random mint for loyal collector
+        _mint(leaf, block.timestamp, true); // mint a deluxe mint for loyal collector
     }
-
-    // FOR TESTING: UNCOMMENT TO RUN TESTS
-    // For testing, we need to able to generate a specific random capsule.
-    /*function mintWithSeedForcedRandom(uint256 _seed) public payable {
-        require(msg.value >= 0.074 ether, "MORE ETH NEEDED"); // $100
-        _mint(msg.sender, _seed, true);
-    }*/
 
     /* INTERNAL MINT FUNCTIONS */
-    function _mint(address _owner, uint256 _seed, bool _randomMint) internal {
+    function _mint(address _owner, uint256 _seed, bool _deluxe) internal {
         require(block.timestamp > startDate, "NOT_STARTED"); // ~ 2000 gas
         require(block.timestamp < endDate, "ENDED");
-        _createNFT(_owner, _seed, _randomMint);
+        _createNFT(_owner, _seed, _deluxe);
     }
 
-    function _createNFT(address _owner, uint256 _seed, bool _randomMint) internal {
+    function _createNFT(address _owner, uint256 _seed, bool _deluxe) internal {
         uint256 tokenId = uint(keccak256(abi.encodePacked(_seed, _owner)));
-        if(_randomMint) { randomMints[tokenId] = _randomMint; }
+        if(_deluxe == true) { deluxeIDs[tokenId] = _deluxe; }
         super._mint(_owner, tokenId);
     }
 
     // WITHDRAWING ETH
     function withdrawETH() public {
-        recipient.call{value: address(this).balance}(""); // this is safe because the recipient is known
+        recipient.call{value: address(this).balance}(""); // this *should* be safe because the recipient is known
+    }
+
+    /*
+    If for some reason, the split/recipient is not allowing one to withdraw, this emergency admin withdraw
+    can be used to send any other address.
+    If set up correctly, this will do nothing.
+    */  
+    function emergencyWithdraw(address _newRecipient) public {
+        require(msg.sender == owner, "NOT_OWNER");
+        (bool success, bytes memory returnData)  = recipient.call{value: address(this).balance}("");
+        if(success == false) {
+            _newRecipient.call{value: address(this).balance}("");
+        } else { revert('emergency not needed'); } // this can't be used if normal withdraw works
     }
 }

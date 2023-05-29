@@ -56,82 +56,32 @@ library utils {
         return string(result);
     }
 
-    function generateDecimalString(uint nr, uint decimals) internal pure returns (string memory) {
+
+    /*function generateDecimalString(uint nr, uint decimals) internal pure returns (string memory) {
         if(decimals == 1) { return string(abi.encodePacked('0.', uint2str(nr))); }
         if(decimals == 2) { return string(abi.encodePacked('0.0', uint2str(nr))); }
         if(decimals == 3) { return string(abi.encodePacked('0.00', uint2str(nr))); }
         if(decimals == 4) { return string(abi.encodePacked('0.000', uint2str(nr))); }
-    }
+    }*/
 
     // entropy carving
     // extrapolated into utils file in order to re-use between drawing + trait generation
-    // 19 random variables
-    function getAmount(bytes memory hash) internal pure returns (uint256) { return 2+uint256(toUint8(hash, 0))/16;  }  // 2 - 18
-    function getRange(bytes memory hash) internal pure returns (uint256) { return 220 + uint256(toUint8(hash, 1))/4;  } // 180 - 240
-    function getColour(bytes memory hash) internal pure returns (uint256) { return uint256(toUint8(hash, 2))*360/256;  } // 0 - 360
-    function getColourShift(bytes memory hash) internal pure returns (uint256) { return uint256(toUint8(hash, 3));  } // 0 - 255
-    function getSandSeed(bytes memory hash) internal pure returns (uint256) { return uint256(toUint8(hash, 4));  } 
-    function getSandScale(bytes memory hash) internal pure returns (uint256) { return 1 + uint256(toUint8(hash, 5))/8;  } 
-    function getSandOctaves(bytes memory hash) internal pure returns (uint256) {return 1 + uint256(toUint8(hash, 6))/64;  } 
-    function getFineSandSeed(bytes memory hash) internal pure returns (uint256) {return uint256(toUint8(hash, 7)); } 
-    function getFineSandOctaves(bytes memory hash) internal pure returns (uint256) {return 1 + uint256(toUint8(hash, 8))/64; } 
-    function getColourOffsetShift(bytes memory hash, uint256 offsetIndex) internal pure returns (uint256) {
-        
-        if(offsetIndex == 0 ) { return uint256(toUint8(hash, 9))/128; } // red
-        if(offsetIndex == 1 ) { return uint256(toUint8(hash, 10))/128; } // green
-        if(offsetIndex == 2 ) { return uint256(toUint8(hash, 11))/128; } // blue
-    } 
-    function getColourOffsetChange(bytes memory hash, uint256 offsetIndex) internal pure returns (uint256) {
-
-        if(offsetIndex == 0 ) { return uint256(toUint8(hash, 12))*100/256; } // red
-        if(offsetIndex == 1 ) { return uint256(toUint8(hash, 13))*100/256; } // green
-        if(offsetIndex == 2 ) { return uint256(toUint8(hash, 14))*100/256; } // blue
-    } 
-    function getLeftY(bytes memory hash) internal pure returns (uint256) {return 100+uint256(toUint8(hash, 15))/16; } 
-    function getRightY(bytes memory hash) internal pure returns (uint256) {return 100+uint256(toUint8(hash, 16))/16; } 
-    function getDiffLeft(bytes memory hash) internal pure returns (uint256) {return 10+uint256(toUint8(hash, 17))/16; } 
-    function getDiffRight(bytes memory hash) internal pure returns (uint256) {return 10+uint256(toUint8(hash, 18))/16; } 
-
-    function getIndices(bytes memory hash, bool randomMint) internal pure returns (uint256 _rareCount, uint256 _allCount, uint256[3][10] memory) {
-        uint256[3][10] memory indices; // solidity's array assignents are reversed.
-        // 0 -> assigned slot or not (0 or 1)
-        // 1 -> rare word or not (0 or 1)
-        // 2 -> index in word list (default list (0-52) or rare list (0-31))
-        uint256 allCount;
-        uint256 rareCount;
-
-        uint leftY = getLeftY(hash);
-        uint rightY = getRightY(hash);
-        uint diffLeft = getDiffLeft(hash);
-        uint diffRight = getDiffRight(hash);
-
-        for(uint i = 0; i < 10; i+=1) {
-            uint y;
-            if(i % 2 == 0) {
-                y = leftY;
-                leftY += diffLeft;
-            } else {
-                y = rightY;
-                rightY += diffRight;
-            }
-            if((y+i) % 4 == 0) { // 1 in 4 chance for an experience to be shown
-                uint256 entropy = uint256(toUint8(hash, 19+i));
-                uint256[3] memory IS;
-                IS[0] = 1; // assigned slot (0 or 1)
-                // default for IS[0] is 0, so don't have to assign it
-                if(randomMint && (y+i+entropy) % 3 == 0) { // if its a random mint, the action has 1/3 chance of being rare
-                    IS[1] = 1; // it's a rare word/action
-                    IS[2] = entropy*33/256; // index in rare actions list
-                    rareCount+=1;
-                } else {
-                    // don't have to assign IS[1] because it's 0 on default
-                    IS[2] = entropy*62/256; // index in actions list
-                }
-                indices[i] = IS;
-                allCount+=1; 
-            } 
-        }
-
-        return (rareCount, allCount, indices);
+    function getPetalCount(bytes memory hash) internal pure returns (uint256) {
+        uint8[5] memory petalCounters = [8, 12, 20, 24, 36];
+        uint pI = utils.toUint8(hash,0)/52; //0 - 4.9
+        uint petalCount = petalCounters[pI]; // 360 + 2
+        return petalCount;
     }
+
+    function getHeight(bytes memory hash) internal pure returns (uint256) { return 180-utils.toUint8(hash,1)/2;} // 180 - 52
+    function getSeed(bytes memory hash) internal pure returns (uint256) { return uint256(utils.toUint8(hash,2))*uint256(utils.toUint8(hash,3))*uint256(utils.toUint8(hash,4));} // 0 - 16581375
+
+    function getBaseFrequencyOne(bytes memory hash) internal pure returns (uint256) { return 1 + uint256(utils.toUint8(hash,5))*1000/256; }
+    function getBaseFrequencyTwo(bytes memory hash) internal pure returns (uint256) { return 1 + uint256(utils.toUint8(hash,6))*1000/256; }
+    function getDecimalsOne(bytes memory hash) internal pure returns (uint256) { return uint256(utils.toUint8(hash, 7))*3/256; }
+    function getDecimalsTwo(bytes memory hash) internal pure returns (uint256) { return uint256(utils.toUint8(hash, 8))*3/256; }
+    function getMatrixOffset(bytes memory hash, uint offset) internal pure returns (uint256) { return uint256(utils.toUint8(hash, offset))/4; } // re-uses entropy 0 - 19
+    function getNegOrPos(bytes memory hash, uint offset) internal pure returns (uint256) { return utils.toUint8(hash, offset); } // re-uses entropy 1 - 20
+    function getMidPointReduction(bytes memory hash) internal pure returns (uint256) { return 5 + utils.toUint8(hash,9)/13;  } // 0 - 18-ish
+    function getFrontPetalColour(bytes memory hash) internal pure returns (uint256) { return uint256(utils.toUint8(hash,10))*360/256;  } // 0 - 360
 }
