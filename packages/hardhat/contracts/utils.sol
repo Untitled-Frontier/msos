@@ -56,14 +56,6 @@ library utils {
         return string(result);
     }
 
-
-    /*function generateDecimalString(uint nr, uint decimals) internal pure returns (string memory) {
-        if(decimals == 1) { return string(abi.encodePacked('0.', uint2str(nr))); }
-        if(decimals == 2) { return string(abi.encodePacked('0.0', uint2str(nr))); }
-        if(decimals == 3) { return string(abi.encodePacked('0.00', uint2str(nr))); }
-        if(decimals == 4) { return string(abi.encodePacked('0.000', uint2str(nr))); }
-    }*/
-
     // entropy carving
     // extrapolated into utils file in order to re-use between drawing + trait generation
     function getPetalCount(bytes memory hash) internal pure returns (uint256) {

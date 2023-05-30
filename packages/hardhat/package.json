@@ -28,6 +28,7 @@
     "compile": "hardhat compile",
     "deploy_local": "hardhat run --network localhost scripts/deploy_local.js",
     "deploy_goerli": "hardhat run --network goerli scripts/deploy_goerli.js",
+    "deploy_sepolia": "hardhat run --network sepolia scripts/deploy_sepolia.js",
     "deploy_mainnet": "hardhat run --network mainnet scripts/deploy_mainnet.js",
     "generate_merkle_root": "hardhat run scripts/generate_merkle_root.js",
     "generate_trait_stats": "hardhat run scripts/generate_trait_stats.mjs",

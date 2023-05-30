@@ -773,8 +773,8 @@
       ]
     },
     "/Users/simondlr2/code/ethereum/msos/msos/packages/hardhat/contracts/Collection.sol": {
-      "lastModificationDate": 1685366779918,
-      "contentHash": "64138c20054a00bf70075d797f7cba23",
+      "lastModificationDate": 1685457808594,
+      "contentHash": "d20fbb24cfe9a4dd3ce5079e64ced009",
       "sourceName": "contracts/Collection.sol",
       "solcConfig": {
         "version": "0.8.12",
@@ -925,8 +925,8 @@
       ]
     },
     "/Users/simondlr2/code/ethereum/msos/msos/packages/hardhat/contracts/CollectionDescriptor.sol": {
-      "lastModificationDate": 1685365155526,
-      "contentHash": "df8fb7112af9cfbe7eb3a29475a8f2ad",
+      "lastModificationDate": 1685404850978,
+      "contentHash": "4f82021b5e41c08fac2c5e29cb2826f2",
       "sourceName": "contracts/CollectionDescriptor.sol",
       "solcConfig": {
         "version": "0.8.12",
@@ -1468,8 +1468,8 @@
       ]
     },
     "/Users/simondlr2/code/ethereum/msos/msos/packages/hardhat/contracts/TestDescriptorChange.sol": {
-      "lastModificationDate": 1685298928566,
-      "contentHash": "edd9387a298809be903299847a6e84de",
+      "lastModificationDate": 1685370172035,
+      "contentHash": "98f0f964a6cec257592777fd3bf0bc1a",
       "sourceName": "contracts/TestDescriptorChange.sol",
       "solcConfig": {
         "version": "0.8.12",

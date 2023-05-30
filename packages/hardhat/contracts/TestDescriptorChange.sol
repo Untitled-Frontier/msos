@@ -47,7 +47,6 @@ contract TestDescriptorChange {
         string memory adjustment = utils.uint2str(150+height);
 
         // 8, 12, 20, 24, 36
-        // todo stretch goal: -> map the curves of the sharp petals
         return string.concat('<filter id="blur">',
             patstrMaximal,
             '<feGaussianBlur stdDeviation="1"/>',

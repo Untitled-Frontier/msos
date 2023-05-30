@@ -27,6 +27,10 @@ module.exports = {
     goerli: {
       url: `https://goerli.infura.io/v3/${infuraID}`,
       accounts: [deployAccounts[0].privateKey],
+    },
+    sepolia: {
+      url: `https://rpc.sepolia.dev`,
+      accounts: [deployAccounts[0].privateKey],
     }
   },
   etherscan: {

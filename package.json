@@ -19,6 +19,7 @@
     "generate_trait_stats": "yarn workspace @capsules/hardhat generate_trait_stats",
     "deploy_contracts_local": "yarn workspace @capsules/hardhat deploy_local",
     "deploy_contracts_goerli": "yarn workspace @capsules/hardhat deploy_goerli",
+    "deploy_contracts_sepolia": "yarn workspace @capsules/hardhat deploy_sepolia",
     "deploy_contracts_mainnet": "yarn workspace @capsules/hardhat deploy_mainnet",
     "publish_contracts": "yarn workspace @capsules/hardhat publish_contracts",
     "set_testnet_balance": "yarn workspace @capsules/hardhat set_testnet_balance",

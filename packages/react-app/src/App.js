@@ -47,11 +47,11 @@ function App() {
   let NFTAddress = "0xa6Fd332BD26228Fd88868Ae9a7B512519008B72b"; // mainnet
 
   // for local testing:
-  //NFTAddress = "0xb28f5e8da53de004e8cb2b3bfe744126a47081a5"; //localhost
+  // todo: change for mainnet
+  NFTAddress = "0x600a4446094C341693C415E6743567b9bfc8a4A8"; //localhost
 
-  // should be changed in contracts, test, UI
-  let seedPrice = "0.074"; // ~$100
-  let randomPrice = "0.022"; // ~$30
+  let dxPrice = "0.055"; // ~$100
+  let dfPrice = "0.016"; // ~$30
 
   const [NFTSigner, setNFTSigner] = useState(null);
   const [tree, setTree] =  useState(null);
@@ -70,9 +70,10 @@ function App() {
               setInjectedChainId(id);
 
               // comment out line for local or prod
-              setHardcodedChainId(1); // mainnet
+              // todo: change back to hardcoded for prod
+              // setHardcodedChainId(1); // mainnet
               //setHardcodedChainId(5); // goerli
-              //setHardcodedChainId(id); // local (uses injectedProvider)
+              setHardcodedChainId(id); // local (uses injectedProvider)
           }
       }
   } 
@@ -106,6 +107,7 @@ function App() {
         const vmAddress = Address.fromPrivateKey(pk);
         await vm.stateManager.putAccount(vmAddress, account);
         const NFTFactory = new ethers.ContractFactory(NFTJson.abi, NFTJson.bytecode);
+        // details don't matter for parameters since it only uses it draw IN browser
         const deployTx = NFTFactory.getDeployTransaction("TEST COLLECTION", "T", "0xaF69610ea9ddc95883f97a6a3171d52165b69B03", '100', '2627308000', "0x5a205b661dc03e3b33329ec05c331ddb579d0a146b5a14e68d88d5eafaaa5d15");
         const txData = {
           value: 0,
@@ -128,11 +130,12 @@ function App() {
     loadSigners();
   }, [injectedChainId]);
 
-  async function generateSVG(seed, address_) {
+  // won't need this?
+  /*async function generateSVG(seed, address_) {
     console.log('gsvg');
-    console.log(seed);
+    console.log(seed); // timestamp
     const iface = new Interface(NFTJson.abi);
-    const calldata = iface.encodeFunctionData("generateImageFromSeedAndAddress", [seed, address_]);
+    const calldata = iface.encodeFunctionData("generateFullImageFromVM", [seed, address_, deluxe]);
     //console.log(vm);
     const renderResult = await vm.evm.runCall({
       to: localNFTAddress,
@@ -147,11 +150,11 @@ function App() {
     );
 
     return results;
-  }
+  }*/
 
-  async function generateSVGFromTokenID(tokenId) {
+  async function generateSVGFromTokenID(tokenId, deluxe) {
     const iface = new Interface(NFTJson.abi);
-    const calldata = iface.encodeFunctionData("generateImage", [tokenId]);
+    const calldata = iface.encodeFunctionData("generateImageFromTokenIDAndDeluxe", [tokenId, deluxe]);
     const renderResult = await vm.evm.runCall({
       to: localNFTAddress,
       caller: localNFTAddress,
@@ -167,38 +170,20 @@ function App() {
     return results;
   }
 
-  async function generateSVGFromTokenIDForcedRandom(tokenId) {
-    const iface = new Interface(NFTJson.abi);
-    const calldata = iface.encodeFunctionData("generateRandomMintImageFromTokenID", [tokenId]);
-    const renderResult = await vm.evm.runCall({
-      to: localNFTAddress,
-      caller: localNFTAddress,
-      origin: localNFTAddress,
-      data: Buffer.from(calldata.slice(2), 'hex')
-    });
-
-    const results = ethers.utils.defaultAbiCoder.decode(
-      ['string'],
-      renderResult.execResult.returnValue
-    );
-
-    return results;
-  }
-
-  async function displayFromSeed(seed) {
+  /*async function displayFromSeed(seed) {
     console.log(seed);
     //const callAddress = '0x2a97a65D5673a2c61E95ce33CEcaDF24f654F96D'; // dev address
     const callAddress = address;
     const svg = await generateSVG(seed, callAddress);
     console.log(svg);
     setSVG(svg);
-  }
+  }*/
 
-  async function mintCustomNFT(seed) {
-    let val = ethers.utils.parseEther(seedPrice);
+  async function mintDeluxeNFT() {
+    let val = ethers.utils.parseEther(dxPrice);
     const tx = Transactor(injectedProvider, gasPrice);
     setMinting(true);
-    tx(NFTSigner.functions.mintWithSeed(seed, {value: val}), async function (update) {
+    tx(NFTSigner.functions.mintDeluxe({value: val}), async function (update) {
       /*Used for testing UI*/
       // await new Promise(resolve => setTimeout(resolve, 5000));
       console.log(update);
@@ -209,7 +194,7 @@ function App() {
         const receipt = await txResponse.wait();
         console.log(receipt);
         const tokenId = receipt.logs[0].topics[3];
-        const svg = await generateSVGFromTokenID(tokenId);
+        const svg = await generateSVGFromTokenID(tokenId, true);
         setMintedSVG(svg);
         setMinting(false);
       }
@@ -260,8 +245,8 @@ function App() {
     });
   }*/
 
-  async function mintRandomNFT() {
-    let val = ethers.utils.parseEther(randomPrice);
+  async function mintNFT() {
+    let val = ethers.utils.parseEther(dfPrice);
     const tx = Transactor(injectedProvider, gasPrice);
     setMinting(true);
     tx(NFTSigner.functions.mint({value: val}), async function (update) {
@@ -275,7 +260,7 @@ function App() {
         const receipt = await txResponse.wait();
         console.log(receipt);
         const tokenId = receipt.logs[0].topics[3];
-        const svg = await generateSVGFromTokenIDForcedRandom(tokenId);
+        const svg = await generateSVGFromTokenID(tokenId, false);
         setMintedSVG(svg);
         setMinting(false);
       }
@@ -310,7 +295,7 @@ function App() {
         const receipt = await txResponse.wait();
         console.log(receipt);
         const tokenId = receipt.logs[0].topics[3];
-        const svg = await generateSVGFromTokenIDForcedRandom(tokenId);
+        const svg = await generateSVGFromTokenID(tokenId, true);
         setMintedSVG(svg);
         setMinting(false);
       } 
@@ -352,16 +337,14 @@ function App() {
             hardcodedChainId={hardcodedChainId}
             vm={vm}
             localNFTAddress={localNFTAddress}
-            displayFromSeed={displayFromSeed}
-            mintCustomNFT={mintCustomNFT}
-            mintRandomNFT={mintRandomNFT}
+            mintNFT={mintNFT}
+            mintDeluxeNFT={mintDeluxeNFT}
             claim={claim}
             alreadyClaimed={alreadyClaimed}
-            SVG={SVG}
             mintedSVG={mintedSVG}
             minting={minting}
-            seedPrice={seedPrice}
-            randomPrice={randomPrice}
+            dxPrice={dxPrice}
+            dfPrice={dfPrice}
             tree={tree}
           />
       </Route>

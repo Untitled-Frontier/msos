@@ -10,7 +10,11 @@ import "./CollectionDescriptor.sol";
 
 /*
 Daisychains: Life In Every Breath.
-todo: add more description
+A collection from the Logged Univere Story: MS-OS by Andy Tudhope.
+https://www.untitledfrontier.studio/blog/logged-universe-5-ms-os
+
+Scattered across that empty street, a ceramic shard came to rest in the storm water drain. 
+“Give your time without fear or grief,” it said. “This is grace.”
 */
 
 /**
@@ -20,7 +24,7 @@ todo: add more description
  */
 contract Collection is ERC721 {
 
-    address public owner; // = 0xaF69610ea9ddc95883f97a6a3171d52165b69B03; // for opensea integration. doesn't do anything else.
+    address public owner; // = 0xaF69610ea9ddc95883f97a6a3171d52165b69B03
     address payable public recipient; // in this instance, it will be a 0xSplit on mainnet
 
     CollectionDescriptor public descriptor;
@@ -52,10 +56,6 @@ contract Collection is ERC721 {
         _createNFT(owner, block.timestamp, true);
         claimed[owner] = true;
     }
-
-    /*
-    Custom Code
-    */
 
     // change descriptor (in case there's issues)
     // only allowed by admin/owner until 1 December 2023.
@@ -119,7 +119,7 @@ contract Collection is ERC721 {
     }
 
     /*FOR STATS*/
-    function generateTraitsWithSeedAndAddress(uint256 _seed, address _minter, bool deluxe) public view returns (string memory) {
+    function generateFullTraitsFromVM(uint256 _seed, address _minter, bool deluxe) public view returns (string memory) {
         uint256 customTokenId = uint(keccak256(abi.encodePacked(_seed, _minter))); // seed = timestamp
         return descriptor.generateTraits(customTokenId, deluxe);
     }
@@ -129,9 +129,13 @@ contract Collection is ERC721 {
     These drawing functions are used inside the browser vm to display the NFT without having to call a live network.
     */
 
-    // Generally used inside the browser VM to preview a capsule for seed mints
+    // Generally used inside the browser VM
     function generateFullImageFromVM(uint256 _seed, address _owner, bool deluxe) public view returns (string memory) {
         uint256 tokenId = uint(keccak256(abi.encodePacked(_seed, _owner)));
+        return descriptor.generateImage(tokenId, deluxe);
+    }
+
+    function generateImageFromTokenIDAndDeluxe(uint256 tokenId, bool deluxe) public view returns (string memory) {
         return descriptor.generateImage(tokenId, deluxe);
     }
 
@@ -139,12 +143,12 @@ contract Collection is ERC721 {
     function mintDeluxe() public payable {
         deluxeBuyableSupply+=1;
         require(deluxeBuyableSupply <= 96, "ALL DELUXE HAS BEEN SOLD");
-        require(msg.value >= 0.074 ether, "MORE ETH NEEDED"); // ~$100
+        require(msg.value >= 0.055 ether, "MORE ETH NEEDED"); // ~$100 (~1900/ETH)
         _mint(msg.sender, block.timestamp, true);
     }
 
     function mint() public payable {
-        require(msg.value >= 0.022 ether, "MORE ETH NEEDED"); // ~$30
+        require(msg.value >= 0.016 ether, "MORE ETH NEEDED"); // ~$30 (~1900/ETH)
         _mint(msg.sender, block.timestamp, false);
     }
 

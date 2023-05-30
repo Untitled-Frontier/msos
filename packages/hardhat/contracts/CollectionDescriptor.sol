@@ -185,7 +185,6 @@ contract CollectionDescriptor {
 
     function frontPetal(bytes memory hash, uint rotation) internal pure returns (string memory) {
         uint256 c = utils.getFrontPetalColour(hash);
-        
         return string.concat(
             '<use xlink:href="#ptl" transform="rotate(',utils.uint2str(rotation+1),', 150, 150)" fill="hsl(',utils.uint2str(c),',100%,50%)" stroke="black"/>'
         );
@@ -195,9 +194,8 @@ contract CollectionDescriptor {
         return string(abi.encodePacked('Daisychain #', utils.substring(utils.uint2str(nr),0,8)));
     }
 
-    // todo: expand description
     function generateDescription() public pure returns (string memory) {
-        string memory description = "Daisychains. Life In Every Breath.";
+        string memory description = "Daisychains. Life In Every Breath. Collectible Onchain SVG Flowers inspired by the journey of Hinata in the Logged Universe story: MS-OS.";
         return description;
     }
     
@@ -238,16 +236,4 @@ contract CollectionDescriptor {
     function generateImage(uint256 tokenId, bool deluxe) public pure returns (string memory) {
         return render(tokenId, deluxe);
     } 
-
-    /* HELPERS */
-
-    // todo: comment out
-
-    // hot-chain-svg calls this to render an example image
-    // gasleft() is a hack to get a random nr. The call varies the gas being sent.
-    function example() external view returns (string memory) {
-        uint256 rnr = uint(keccak256(abi.encodePacked(uint256(gasleft()))));
-        //uint256 timestamp = uint(keccak256(abi.encodePacked(uint256(1000011113511))));
-        return render(rnr, true);
-    }
 }

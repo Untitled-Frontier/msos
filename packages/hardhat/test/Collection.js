@@ -19,7 +19,7 @@ const fileName = "Collection";
 const name = "Collection of NFTs";
 const symbol = "NFTS";
 
-const metadataDescription = "Daisychains. Life In Every Breath.";
+const metadataDescription = "Daisychains. Life In Every Breath. Collectible Onchain SVG Flowers inspired by the journey of Hinata in the Logged Universe story: MS-OS.";
 
 let dfPrice = "0.022";
 let dfPriceHalf = "0.011";
@@ -117,7 +117,6 @@ describe("Collection", function() {
   });
 
   // do proper full merkle test with LIVE data
-  // todo: create LIVE LEAVES in helpers.js
   it('Collection: Test LIVE Merkle with direct leaf minting', async () => {
     const tree = await liveTree(); // use liveLeaves
     const leaves = liveLeaves;
@@ -226,7 +225,7 @@ describe("Collection", function() {
     await expect(tx).to.changeEtherBalance(signers[3], ethers.utils.parseEther(dfPrice));
   });
 
-  // todo: test emergency withdraw with successful recipient (should fail)
+  // test emergency withdraw with successful recipient (should fail)
   it('Collection: test emergency withdraw with successful recipient (should fail)', async () => {
     await instance.connect(signers[4]).mint({value: ethers.utils.parseEther(dfPrice), gasLimit});
     const b3 = await provider.getBalance(accounts[3]); // recipient is accounts 3
@@ -247,7 +246,7 @@ describe("Collection", function() {
     await twInstance.connect(signers[3]).mint({value: ethers.utils.parseEther(dfPrice), gasLimit});
     const tx = await twInstance.connect(signers[2]).withdrawETH(); // normal withdraw
     await expect(tx).to.changeEtherBalance(twI, '0'); // withdrawETH will silently fail
-    // emergency withdraw with not owner (todo)
+    // emergency withdraw with not owner 
     await expect(twInstance.connect(signers[1]).emergencyWithdraw(accounts[7], {gasLimit})).to.be.revertedWith('NOT_OWNER');
     // emergency withdraw with right owner
     const tx2 = await twInstance.connect(signers[0]).emergencyWithdraw(accounts[7], {gasLimit}); // emergency withdraw to accounts[7] instead
