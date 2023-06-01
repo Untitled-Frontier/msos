@@ -25,7 +25,7 @@ import { Interface } from 'ethers/lib/utils';
 
 function App() {
   let BigInt;
-  if (typeof BigInt === 'undefined') { BigInt = require('big-integer'); } // todo: is this still even necessary?
+  if (typeof BigInt === 'undefined') { BigInt = require('big-integer'); } // note: is this still even necessary?
 
   /* Universal State*/
   const [address, setAddress] = useState();
@@ -44,11 +44,11 @@ function App() {
   const [SVG, setSVG] = useState(null);
   const [mintedSVG, setMintedSVG] = useState(null);
 
-  let NFTAddress = "0xa6Fd332BD26228Fd88868Ae9a7B512519008B72b"; // mainnet
+  let NFTAddress = "0x0E4447AeCE6d71062c14815F0fC557F29a62Fa19"; // mainnet
 
   // for local testing:
-  // todo: change for mainnet
-  NFTAddress = "0x600a4446094C341693C415E6743567b9bfc8a4A8"; //localhost
+  //NFTAddress = "0x600a4446094C341693C415E6743567b9bfc8a4A8"; //localhost
+  //NFTAddress = "0xdc742b93b9aa0520188f18c88a9d4c8edfd01c1a"; //Sepolia
 
   let dxPrice = "0.055"; // ~$100
   let dfPrice = "0.016"; // ~$30
@@ -70,10 +70,10 @@ function App() {
               setInjectedChainId(id);
 
               // comment out line for local or prod
-              // todo: change back to hardcoded for prod
-              // setHardcodedChainId(1); // mainnet
+              setHardcodedChainId(1); // mainnet
               //setHardcodedChainId(5); // goerli
-              setHardcodedChainId(id); // local (uses injectedProvider)
+              //setHardcodedChainId(id); // local (uses injectedProvider)
+              //setHardcodedChainId(11155111); //sepolia
           }
       }
   } 
@@ -130,28 +130,6 @@ function App() {
     loadSigners();
   }, [injectedChainId]);
 
-  // won't need this?
-  /*async function generateSVG(seed, address_) {
-    console.log('gsvg');
-    console.log(seed); // timestamp
-    const iface = new Interface(NFTJson.abi);
-    const calldata = iface.encodeFunctionData("generateFullImageFromVM", [seed, address_, deluxe]);
-    //console.log(vm);
-    const renderResult = await vm.evm.runCall({
-      to: localNFTAddress,
-      caller: localNFTAddress,
-      origin: localNFTAddress,
-      data: Buffer.from(calldata.slice(2), 'hex')
-    });
-
-    const results = ethers.utils.defaultAbiCoder.decode(
-      ['string'],
-      renderResult.execResult.returnValue
-    );
-
-    return results;
-  }*/
-
   async function generateSVGFromTokenID(tokenId, deluxe) {
     const iface = new Interface(NFTJson.abi);
     const calldata = iface.encodeFunctionData("generateImageFromTokenIDAndDeluxe", [tokenId, deluxe]);
@@ -169,15 +147,6 @@ function App() {
 
     return results;
   }
-
-  /*async function displayFromSeed(seed) {
-    console.log(seed);
-    //const callAddress = '0x2a97a65D5673a2c61E95ce33CEcaDF24f654F96D'; // dev address
-    const callAddress = address;
-    const svg = await generateSVG(seed, callAddress);
-    console.log(svg);
-    setSVG(svg);
-  }*/
 
   async function mintDeluxeNFT() {
     let val = ethers.utils.parseEther(dxPrice);

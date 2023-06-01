@@ -12,20 +12,15 @@ async function main() {
     const c = await C.deploy("Daisychains: Life In Every Breath", "LIEB", "0xaF69610ea9ddc95883f97a6a3171d52165b69B03", '100', '2627308000', root, {gasLimit: "50000000"});
     const cd = await c.deployed();
     console.log(cd);
-    /*const id = await c.newlyMinted();
-    //const ig = await cd.estimateGas.tokenURI(id);
+    const id = await c.newlyMinted();
+    const ig = await cd.tokenURI(id);
     const i = await cd.generateImage(id);
     const t = await cd.generateTraits(id);
-    const ii = await cd.indices(id);
-    const u = await cd.tokenURI(id);
 
-    //console.log(ig.toString());
     console.log(t.toString());
-    //console.log(u.toString());
     console.log(id.toString());
     console.log(i.toString());
-    console.log(ii.toString());
-    console.log(u.toString());*/
+    console.log(ig.toString());
 
     const cAddress = await c.address;
     console.log("MSOS deployed to: ", cAddress);

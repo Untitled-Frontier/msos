@@ -56,14 +56,6 @@ library utils {
         return string(result);
     }
 
-
-    /*function generateDecimalString(uint nr, uint decimals) internal pure returns (string memory) {
-        if(decimals == 1) { return string(abi.encodePacked('0.', uint2str(nr))); }
-        if(decimals == 2) { return string(abi.encodePacked('0.0', uint2str(nr))); }
-        if(decimals == 3) { return string(abi.encodePacked('0.00', uint2str(nr))); }
-        if(decimals == 4) { return string(abi.encodePacked('0.000', uint2str(nr))); }
-    }*/
-
     // entropy carving
     // extrapolated into utils file in order to re-use between drawing + trait generation
     function getPetalCount(bytes memory hash) internal pure returns (uint256) {
@@ -82,6 +74,6 @@ library utils {
     function getDecimalsTwo(bytes memory hash) internal pure returns (uint256) { return uint256(utils.toUint8(hash, 8))*3/256; }
     function getMatrixOffset(bytes memory hash, uint offset) internal pure returns (uint256) { return uint256(utils.toUint8(hash, offset))/4; } // re-uses entropy 0 - 19
     function getNegOrPos(bytes memory hash, uint offset) internal pure returns (uint256) { return utils.toUint8(hash, offset); } // re-uses entropy 1 - 20
-    function getMidPointReduction(bytes memory hash) internal pure returns (uint256) { return 5 + utils.toUint8(hash,9)/13;  } // 0 - 18-ish
+    function getMidPointReduction(bytes memory hash) internal pure returns (uint256) { return 5 + utils.toUint8(hash,9)/13;  } // 5 - 25-ish
     function getFrontPetalColour(bytes memory hash) internal pure returns (uint256) { return uint256(utils.toUint8(hash,10))*360/256;  } // 0 - 360
 }

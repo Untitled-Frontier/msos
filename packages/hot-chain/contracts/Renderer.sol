@@ -11,8 +11,9 @@ Partly inspired by Zond's Flowers by onchainCo: https://opensea.io/collection/fl
 */
 import './svg.sol';
 import './utils.sol';
+import "./utils/Base64.sol";
 
-contract Renderer {
+contract CollectionDescriptor {
 
     function render(uint256 _tokenId, bool deluxe) internal pure returns (string memory) {
         bytes memory hash = abi.encodePacked(bytes32(_tokenId));
@@ -21,20 +22,30 @@ contract Renderer {
         uint petalCount = utils.getPetalCount(hash); 
         uint rotation = 360/petalCount;
 
-        string memory animation = "";
+        string memory style = '<style>'; // note: keeping this separate due to this having global styles in the past.
+        string memory animationButtons = "";
+        string memory animationSetters = "";
 
         if(deluxe == true) {
-            animation = '<style>#entire {transform-origin: 150px 150px;animation: rotate 80s linear infinite; }@keyframes rotate {from {transform: rotate(0deg);}to {transform: rotate(360deg);}</style>';
+            animationButtons = '<circle class="startButton" cx="150" cy="150" r="50" fill-opacity="0" ><animate dur="0.01s" id="startAnimation" attributeName="r" values="50; 0" fill="freeze" begin="click" /><animate dur="0.01s" attributeName="r" values="0; 50" fill="freeze" begin="stopAnimation.end" /></circle><circle class="button" cx="150" cy="150" r="0" fill-opacity="0" ><animate dur="0.001s" id="stopAnimation" attributeName="r" values="50; 0" fill="freeze" begin="click" /><animate dur="0.001s" attributeName="r" values="0; 50" begin="startAnimation.end" fill="freeze"  /></circle>';
+            animationSetters = '<set attributeName="class" to="rotate" begin="startAnimation.begin"/><set attributeName="class" to="notRotate" begin="stopAnimation.begin"/>';
+            style = string.concat(style,
+                '.startButton { cursor: pointer; } .rotate {transform-origin: 150px 150px;animation: rotate 100s linear infinite; }@keyframes rotate {from {transform: rotate(0deg);}to {transform: rotate(360deg);}}'
+            );
         }
 
+        style = string.concat(style,'</style>');
+
         return string.concat(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" style="background:#fff" xmlns:xlink="http://www.w3.org/1999/xlink">',
-                animation,
+                '<svg xmlns="http://www.w3.org/2000/svg" version="2.0" style="background:#fff" viewBox="0 0 300 300" width="600" height="600" xmlns:xlink="http://www.w3.org/1999/xlink">',
+                style,
                 filtersPathsAndMasks(hash),
-                '<g id="entire">',
                 reusables(hash, petalCount, rotation),
-                '<use xlink:href="#flower" clip-path="url(#halfClip)" transform="rotate(0, 150, 150)"/>',
-                '<use xlink:href="#flower" clip-path="url(#halfClip)" transform="rotate(180, 150, 150)"/>',
+                '<g id="entire">',
+                animationSetters,
+                '<use href="#flower" clip-path="url(#halfClip)" transform="rotate(0, 150, 150)"/>',
+                '<use href="#flower" clip-path="url(#halfClip)" transform="rotate(180, 150, 150)"/>',
+                animationButtons,
                 '</g>',
                 '</svg>'
             );
@@ -46,8 +57,6 @@ contract Renderer {
         uint height = utils.getHeight(hash); //  180 - 52
         string memory adjustment = utils.uint2str(150+height);
 
-        // 8, 12, 20, 24, 36
-        // todo stretch goal: -> map the curves of the sharp petals
         return string.concat('<filter id="blur">',
             patstrMaximal,
             '<feGaussianBlur stdDeviation="1"/>',
@@ -56,20 +65,20 @@ contract Renderer {
             patstrMinimal,
             '</filter>',
             '<clipPath id="blurClip">',
-            '<rect x="150" y="150" width="300" height="300"/>',
+            '<rect x="145" y="145" width="215" height="215"/>',
             '</clipPath>',
             '<clipPath id="patternClip">',
-            '<path d="M 150 150 L ',adjustment,' 150 Q ',adjustment,' ',adjustment,' 150 ',adjustment,' Z"/>'
+            '<path d="M 145 145 L ',adjustment,' 145 Q ',adjustment,' ',adjustment,' 145 ',adjustment,' Z"/>'
             '</clipPath>',
             '<clipPath id="halfClip">',
-            '<rect transform="rotate(1, 150, 150)" width="260" height="610" x="-110" y="-110"/>',
+            '<rect width="260" height="610" x="-110" y="-110"/>',
             '</clipPath>'
         );
     }
 
     function outerPetalPattern(bytes memory hash, bool maximalist) internal pure returns (string memory) {
         // latter 0.0 isn't strictly necessary, but keeping it in for vestigial reasons
-        string memory oppBF = generateBaseFrequency(hash, ['0.0', '0.00', '0.00'], ['0.0', '0.0', '0.0']);
+        string memory oppBF = generateBaseFrequency(hash, ['0.0', '0.00', '0.00'], ['0.0', '0.0', '0.00']);
         string memory oppSeed = utils.uint2str(utils.getSeed(hash)); // 0 - 16581375
 
         return string.concat(
@@ -106,10 +115,9 @@ contract Renderer {
 
             if(i == 18) { // Alpha modified by itself. Adds more of everything or less of everything.
                 // note: code borrowed from room of infinite paintings
-                // in general: higher -> brighter colours. lower -> darker colours
-                // string memory modStr = string.concat("-", utils.uint2str(1), ' ');
-                // string memory modStr = string.concat("-", utils.uint2str(1), ' ');
-                strMatrix = string.concat(strMatrix, '0 '); 
+                // in general: higher -> more infill. lower -> less infilling and more transparency.
+                // higher was chosen so one can see the blur + higher likelihood of pieces overlapping
+                strMatrix = string.concat(strMatrix, '-50 '); 
             } else if(i == 19) { 
                 // final channel is the shift of the alpha channel
                 // making it mildly brighter ensure *some* color
@@ -141,15 +149,15 @@ contract Renderer {
     }
 
     function reusables(bytes memory hash, uint petalCount, uint rotation) internal pure returns (string memory) {
-        string memory height = utils.uint2str(utils.getHeight(hash));
+        //string memory height = utils.uint2str(utils.getHeight(hash));
         uint midPointReduction = utils.getMidPointReduction(hash);
         uint endPointReduction = midPointReduction*2; // 0 - 36-ish
 
         string memory petals = generatePetals(hash, petalCount, rotation);
 
         string memory rs = string.concat('<defs>',
-        '<rect id="tap" x="150" y="150" width="',height,'" height="',height,'" filter="url(#sharp)"/>',
-        '<rect id="blurtap" x="150" y="150" width="500" height="500" filter="url(#blur)"/>',
+        '<rect id="tap" x="150" y="150" width="200" height="200" filter="url(#sharp)"/>',
+        '<rect id="blurtap" x="150" y="150" width="200" height="200" filter="url(#blur)"/>',
         '<path id="ptl" d="M 150 150 Q ',utils.uint2str(150-midPointReduction),' ',utils.uint2str(150-endPointReduction),' 150 ',utils.uint2str(150-endPointReduction),' ',utils.uint2str(150+midPointReduction),' ',utils.uint2str(150-endPointReduction),' 150 150 Z" stroke="black"/>',
         '<g id="flower">', petals, '</g></defs>'
         );
@@ -163,7 +171,7 @@ contract Renderer {
         string memory frontPetals = "";
         for(uint i = 0; i<petalCount; i+=1) {
             if(i < (petalCount/4*3)+2) { // 3/4 of the wheel.
-                backPetals = string.concat(backPetals, backPetal(rotation*(i+1)));
+                backPetals = string.concat(backPetals, backPetal(rotation*(i)+1));
                 frontPetals = string.concat(frontPetals, frontPetal(hash, rotation*(i+1)+90));
             }
         }
@@ -185,14 +193,65 @@ contract Renderer {
 
     function frontPetal(bytes memory hash, uint rotation) internal pure returns (string memory) {
         uint256 c = utils.getFrontPetalColour(hash);
-        
         return string.concat(
             '<use xlink:href="#ptl" transform="rotate(',utils.uint2str(rotation+1),', 150, 150)" fill="hsl(',utils.uint2str(c),',100%,50%)" stroke="black"/>'
         );
     }
 
-    function generateName(uint nr) public pure returns (string memory) {
-        return string(abi.encodePacked('Daisychain #', utils.substring(utils.uint2str(nr),0,8)));
+    function generateURI(uint256 tokenId, bool deluxe) public pure returns (string memory) {
+        string memory name = generateName(tokenId, deluxe); 
+        string memory description = generateDescription();
+        string memory image = generateBase64Image(tokenId, deluxe);
+        string memory attributes = generateTraits(tokenId, deluxe);
+
+        string memory animation = "";
+        if(deluxe == true) {
+            animation = string.concat('", "animation_url": "',
+                'data:image/svg+xml;base64,', 
+                image
+            );
+        }
+
+        return string(
+            abi.encodePacked(
+                'data:application/json;base64,',
+                Base64.encode(
+                    bytes(
+                            abi.encodePacked(
+                            '{"name":"', 
+                            name,
+                            '", "description":"', 
+                            description,
+                            '", "image": "', 
+                            'data:image/svg+xml;base64,', 
+                            image,
+                            animation,
+                            '", ',
+                            attributes,
+                            '}'
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    function generateBase64Image(uint256 tokenId, bool deluxe) public pure returns (string memory) {
+        bytes memory img = bytes(generateImage(tokenId, deluxe));
+        return Base64.encode(img);
+    }
+
+    function generateName(uint nr, bool deluxe) public pure returns (string memory) {
+        string memory prefix = "Default";
+        if(deluxe == true) {
+            prefix = "Deluxe";
+        }
+        return string(abi.encodePacked(prefix, ' Daisychain #', utils.substring(utils.uint2str(nr),0,8)));
+    }
+
+    function generateDescription() public pure returns (string memory) {
+        string memory description = "Daisychains. Life In Every Breath. Collectible Onchain SVG Flowers inspired by the journey of Hinata in the Logged Universe story: MS-OS. Deluxe Daisychains can rotate if you click on their centers.";
+        return description;
     }
     
     function generateTraits(uint256 tokenId, bool deluxe) public pure returns (string memory) {
@@ -229,7 +288,7 @@ contract Renderer {
         );
     }
 
-    function generateImage(uint256 tokenId, bool deluxe) public view returns (string memory) {
+    function generateImage(uint256 tokenId, bool deluxe) public pure returns (string memory) {
         return render(tokenId, deluxe);
     } 
 

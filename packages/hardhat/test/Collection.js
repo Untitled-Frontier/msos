@@ -19,16 +19,16 @@ const fileName = "Collection";
 const name = "Collection of NFTs";
 const symbol = "NFTS";
 
-const metadataDescription = "Daisychains. Life In Every Breath. Collectible Onchain SVG Flowers inspired by the journey of Hinata in the Logged Universe story: MS-OS.";
+const metadataDescription = "Daisychains. Life In Every Breath. Collectible Onchain SVG Flowers inspired by the journey of Hinata in the Logged Universe story: MS-OS. Deluxe Daisychains can rotate if you click on their centers.";
 
-let dfPrice = "0.022";
+let dfPrice = "0.016";
 let dfPriceHalf = "0.011";
-let dxPrice = "0.074";
+let dxPrice = "0.055";
 
 /* END CONFIG */
 let factory;
 
-// NOTE: Since capsules are determined by the minting address, these tests only work if using the defaultAccounts() mnemonic.
+// NOTE: Since daisychains are determined by the minting address, these tests only work if using the defaultAccounts() mnemonic.
 
 describe("Collection", function() {
   let instance;
@@ -50,7 +50,7 @@ describe("Collection", function() {
     root = merkleTree.getHexRoot();
 
     // latter parameters = recipient, campaign_start, campaign_end 
-    instance = await factory.deploy(name, symbol, accounts[3], '100', '1941431093', root); // wide campaign window for testfactory. dates tested separately
+    instance = await factory.connect(signers[0]).deploy(name, symbol, accounts[3], '100', '1941431093', root); // wide campaign window for testfactory. dates tested separately
     await instance.deployed();
     snapshot = await provider.send('evm_snapshot', []);
   });
@@ -122,12 +122,12 @@ describe("Collection", function() {
     const leaves = liveLeaves;
     const instance2 = await factory.deploy(name, symbol, accounts[3], '100', '1941431093', tree.getHexRoot()); // wide campaign window for testfactory. dates tested separately
 
-    // use test account on live data root. should fail
-    await expect(instance2.connect(signers[6]).loyalMintLeaf(tree.getHexProof(keccak256(leaves[0])), accounts[6], {gasLimit})).to.be.revertedWith("Invalid Proof");
+    // use account that's not in LIVE or Test Accounts
+    await expect(instance2.connect(signers[6]).loyalMintLeaf(tree.getHexProof(keccak256(leaves[10])), accounts[6], {gasLimit})).to.be.revertedWith("Invalid Proof");
 
     for(let i = 0; i < leaves.length; i+=1) {
       // owner is claimed upon deployment
-      if(leaves[i] != accounts[0]) { // this does not technically reflect live data because owner is not hardcoded anymore. todo: stretch goal fix. not serious.
+      if(leaves[i].toLowerCase() != accounts[0].toLowerCase()) { // this does not technically reflect live data because owner is not hardcoded anymore. todo: stretch goal fix. not serious.
         await instance2.connect(signers[6]).loyalMintLeaf(tree.getHexProof(keccak256(leaves[i])), leaves[i], {gasLimit});
       }
       await expect(instance2.connect(signers[6]).loyalMintLeaf(tree.getHexProof(keccak256(leaves[i])), leaves[i], {gasLimit})).to.be.revertedWith("Already claimed");
@@ -253,13 +253,12 @@ describe("Collection", function() {
     await expect(tx2).to.changeEtherBalance(signers[7], ethers.utils.parseEther(dfPrice)); // should've transferrred successfully
   });
 
-
-
   // note: this test will fail after Dec 1 2023 as you cant change descriptor after then
   it('Collection: test changing Descriptor', async () => {
     const txd = await instance.connect(signers[1]).mint({value: ethers.utils.parseEther(dfPrice), gasLimit});
     const receiptd = await txd.wait();
     const tokenIdd = receiptd.events[0].args.tokenId.toString();
+    console.log(tokenIdd);
     const testDescriptorFactory = await ethers.getContractFactory('TestDescriptorChange');
     const td = await testDescriptorFactory.deploy();
     await td.deployed();

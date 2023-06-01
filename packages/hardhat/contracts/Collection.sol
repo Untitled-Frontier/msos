@@ -3,9 +3,7 @@
 pragma solidity ^0.8.9;
 
 import "./ERC721.sol";
-import "./utils/Base64.sol";
 import "./utils/MerkleProof.sol";
-
 import "./CollectionDescriptor.sol";
 
 /*
@@ -15,6 +13,57 @@ https://www.untitledfrontier.studio/blog/logged-universe-5-ms-os
 
 Scattered across that empty street, a ceramic shard came to rest in the storm water drain. 
 “Give your time without fear or grief,” it said. “This is grace.”
+
+ooolc:,.                ..........',,..,:;'.      ..';:::::::;;,.                               .;od
+''...                   ..,,,,,;;::coxdoddo:.    ..';::::::clodd:::,.           ..               'ld
+                         .';::::::lxKNXkddddl,.  .,;:cc::cdOKNNKxddo;.        ....               .;o
+                         ..,:::::cxXWMWXOxdddl' .,;:coolokXWMMWKxdddc.     ...,,'..               .,
+                          .,;cccclOWMMMWN0xddo;..;:coxxdOWMMMMWKxdddl'   ..',;;;;'..                
+                ..'...    .';clood0WMMMMMWKkdo;.':loxOOkXMMMMMWXkdddc. ..,;:::::::;'..              
+            ....;looolc;.. .,:ldkxkNMMMMMMWXOd:':dxx0K0XWMMMMMWXkddc'..,;:clc:::::::;,.             
+          ..';:lxkxdddddoc'..;ldk0OKMMMMMMWNKxlclxkOK0KWMMMMMMWXkdc'.';clodollodxxxdo:.             
+        ..';::ckNNK0Okxdddl,.'cdOK0KWMMMWWNOdllcoxOOkOXNWWWMWWNKkl;,:ldxkkxxOKXWWWWXOoc:'           
+  ......',::::lOWMMWWNX0Oxdo;':dk000XNNXKOxocclldxdlloxOOOOOkxdoolcoxO000O0NMMMMMWNOxddo;.          
+   ...,,;:::::cxXWMMMMMWWNKOxllldOkdxkkxddoc,;cldolc:cloddolc:cllldk00KKXNMMMMMMWNOxdddl'           
+      .',;::ccclkNMMMMMMMMWNOolloxdccclool;..'coxdlcccllc:,.';clodddxOXWMMMMMMMWNOxdddl,            
+       ..';:cloddk0NMMMMMMMXdccllldoc:clc;'. .cdkdlccc:;'...,codolccokKNWWMMMMWXOxddoc'      .......
+         ..,;:loxOO0XWMMMWXkoo:,:coxdccc:,. .:k0Oxoc:;'.  .;ldxoc:ccldxkOKXNWNXOdoc;'.....'''',,,,..
+           ..';coxOKKKNWNKOddl,..,ldkxlc:,..,OWWNOoc;'..'oOOkkdcccccllllooldxkxo:,'.',;;::::::::;'..
+   ..',;;;;,...';oxOK0Okkdoooc,. .;x00Oo:,..:XMMMKxl'..lKWMWKdc::;,,'..';:clllllllllooooolcc:::::,..
+  'cooddddddol:,';lodOxocccclc;'. .kWWWXkc..oXWWWXKo.,dXMMMNk:;,...  ..,:clodddkO000OOkxdolccc:::;'.
+ .,oxxxxxxxxxxxxdooccoddolcccc:;...cKWMMN0l;kNNNNNXkoKNNNWNk;...,;:lccldddoooodk0KKKKK0KKXKK0Oxl::;.
+,;cxKXXXXXXNNNNNNKxlclclodxdolc:;'..cKNNNNXOKWMWWNNXNMMWNN0l:cokKNWWKkxxolcc:coOXNWMMMMMMMMMMWNKxl,.
+;::oKWMMMMMMMMMMMW0llc;,;cldkOOkdl;..oXNWWWNKKK0OOOO0KKXNNKKXXNWMMWXkolccccclldOXWMMMMMMMMMMWXKOko;.
+:::coOXWMMMMMMMMMWKxdo,....;xXWWWNX0xd0WMWKkxxookkkxodxxkKWMWNNWNKxc;;;,;;:ccodxkKWMMMMMWWNKOxdddoc'
+:::::cok0XNWWMMMMNKkdoc;'.  'oKWMMWNNNNN0OddkkddkxddxkxddxOKNWXOd:..........',:ood0NWWNX0Oxdddddo:'.
+::::cclodxO0KXXNNX0xoolc:;'...':xKXNWWWKxxxddxxdddldxddxkkkx0WNK0Okxdddc;....',:cclxOOkxdddoolc;..  
+,;;::ccloxkO00000kdlcccccc:;,,'..:d0NWNkddxxxddollcloddxxxxdkNMWNNWMMMMWKxolllccllccll;,,,''...     
+....',,;;:cloxkkOkdolllloooodxxxkOO0XW0xxxddddoc;'';coodxxkkx0WWNNNNXXK0kxxdddooodddodl:;,''.....   
+      .....',:lllodoooddxxk0NWWMMWNNWMXxdxxxdddl:;;:loddddddxKWN0dc:;:ccccccccccloxO00Okxolcc::;,,'.
+    .';::cccclddlclc:;;,,,:x0XNNNNXNWMWOdxxxxdddoodoodddxkxdOWMWN0d;...',;:cclllok0KKKK0Okxdolcc:::;
+ .':loddddxkOKXX0dclc,... ...,;,;:ldOXWXkxxdddxxddkxdxkxodxkXWWNNNNNOl,. .';:lodx0NWWWNXK0Okdl::::::
+.:lddddxk0XNWMMMWNOxdoc:,,''.'''';oOXNWWNKkdxkxddkkkddkxdkKNNK0XNWMMMW0l.  .':odxKWMMMMMMMWWXOdc::::
+'codxkOKNWMMMMMMMWN0xdoolc::::cokKNWWNNWWWX0OOkxxxxxxkOOKNWWW0l;cxOKXXKkl;'..,looKWMMMMMMMMMMWXkl::;
+.,lkKNWMMMMMMMMMMMWXOdlcccclodkKWMMMNKOkdONWWWWNKKKXNWWXXNNNNXk, .;clodxxdoc::cclkNWWWWWWWWWWWWXxc:;
+.;cok0XNWWMWWNNXNXK0kocclloxxxxOK0kd:'.'oXWNNWW00NNNWWWOoONWWWWk'..,:ccclodoooolldO0000000OOOOOOd:'.
+.,::ccodxxkkkOO00000Oxddooolc;'.......,oKWMWN0d;dNWWNNXd.,dKWMMNd. .,:ccc:cloxxlll::loddddddddddl,. 
+..,::::::codxxxxxxxxollllc:,......',;:lOWMMWk;..oXWWMWXc..;lkXXXk' ..;clllloox0Oxd:'.',:lloollc:,.  
+..';::::ccccccc:;;;:loollccc:::::::cclk0XWKo'..,l0WWMMK;..,:cdkkd:. .,codxkKK00K0kdc;'.........     
+..';;;;;;;,,'....,:ldOK00kxxxdoolccclxkxdl'...,:ck0KXXd. .,:ccoxxo:,.,odx0XWWWNK00Oxlc;,..          
+..''......   .':lodxKNWMMWWXKOxoc:cldxo:.  .';:ccdOkxo' ..;ccccldolc:clo0WWMMMMWKOkxdoc:;,..        
+..          .:odddkKWMMMMMMMWXOdllodol:,..';:ccccdkkdc. .,:llc::ldollclkNMMMMMMMWN0xolcc::,'.       
+           .:odddkKWMMMMMMMWNK0Okxdolc:::cloolc:coxdlc,.,coddoollxkoclokXNWMMMMMMMW0oc:::::;,..     
+           ,ldddkKWMMMMMMNK0K00Oxollllloxxxxdolccdxoll::ldxkOKK0kO0xoc:lxk0XNWWMMMMNkl:::::;,''...  
+          .,lodkKWMMMMWN0kkOOkdoc:ldk0KXXNXXX0xdxkxdlllldOXNWWWNK0Kkd:.'codxkO0KNWMWOl:::;'.....    
+           ..,lk0KKK0Oxdoxxdol;'.;okXWMMMMMMWX000xolcldOXWMMMMMWK00Odc,..:oddddxxOKKxc:;'..         
+             .;:cclccc:clocc;'..;odkXWMMMMMMNKKKkxdl;cx0NWMMMMMMXkOkdl:'..':loddddol;,'..           
+             ..';::::::cc:;,...;oddkXWMMMMMN0O0kdl:,.;ox0NWMMMMMWOdxdl:;.   .',;::;'                
+               ..',;:::;;'..  .ldddkKWMMMMMKxkkdl:,..;odxOXWMMMMW0olllc:,.                          
+.                ..,;;,'..    'ldddxKWMMMWXxoddl:,'..,odddkKNWMWNkl::c::,.                          
+c'                .',..       .:oddx0WWWXOoccllc;'.. .:odddx0NWN0oc:::::;'.                         
+oc.               ...          'coodO0Oxoc:::cc:,..   .;ldddx0Kklc::::;;;,.                       ..
+dl,.              ..            ...':c:::::::::,..     .':llc:::;;,,'...''..                 ..,;;:c
+do;.    .                          .';;;;::::;;'.        .','..''...........                .:lodddd
 */
 
 /**
@@ -52,7 +101,6 @@ contract Collection is ERC721 {
         loyaltyRoot = root_;
 
         // mint #1 to UF to kickstart it. this is from the loyal mint so also set claim to true.
-        // a random mint
         _createNFT(owner, block.timestamp, true);
         claimed[owner] = true;
     }
@@ -75,37 +123,13 @@ contract Collection is ERC721 {
      */
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
-
-        string memory name = descriptor.generateName(tokenId); 
-        string memory description = descriptor.generateDescription();
-
-        string memory image = generateBase64Image(tokenId);
-        string memory attributes = generateTraits(tokenId);
-        return string(
-            abi.encodePacked(
-                'data:application/json;base64,',
-                Base64.encode(
-                    bytes(
-                        abi.encodePacked(
-                            '{"name":"', 
-                            name,
-                            '", "description":"', 
-                            description,
-                            '", "image": "', 
-                            'data:image/svg+xml;base64,', 
-                            image,'",',
-                            attributes,
-                            '}'
-                        )
-                    )
-                )
-            )
-        );
+        bool deluxe = deluxeIDs[tokenId];
+        return descriptor.generateURI(tokenId, deluxe);
     }
 
     function generateBase64Image(uint256 tokenId) public view returns (string memory) {
-        bytes memory img = bytes(generateImage(tokenId));
-        return Base64.encode(img);
+        bool deluxe = deluxeIDs[tokenId];
+        return descriptor.generateBase64Image(tokenId, deluxe);
     }
 
     function generateImage(uint256 tokenId) public view returns (string memory) {

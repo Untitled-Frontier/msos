@@ -1,7 +1,7 @@
 
-## Capsules of All Our Lives 
+## Daisychains: Life In Every Breath
 
-Capsules containing visualizations of all the lives lived by simulated minds. For the story "Upstream Glitches". All metadata + art is on-chain.
+Generative Onchain SVG NFTs inspired by Hinata's Journey in the Logged Universe story: MS-OS. All metadata + art is on-chain.
 
 ### Technicals
 

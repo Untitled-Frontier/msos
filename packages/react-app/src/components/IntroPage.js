@@ -10,16 +10,16 @@ function IntroPage(props) {
 
     const [mintSection, setMintSection] = useState('');
     const [displaySection, setDisplaySection] = useState('');
+    const [typeMinted, setTypeMinted] = useState('default');
     //const [owner, setOwner] = useState(null);
 
     const startDateString = "05 June 2023 14:00 GMT";
     const endDateString = "03 July 2023 14:00 GMT";
     const snapshotDate = "29 May 2023 14:00 GMT";
-    // const startDateUnix = 1685973600; // 05 June 2023
-    const startDateUnix = 168597360; // 05 June 2023 (testing)
+    const startDateUnix = 1685973600; // 05 June 2023
     const endDateUnix = 1688392800; // 03 July 2023
 
-    const wrongNetworkHTML = <Fragment>You are on the wrong network. Please switch to mainnet on your web3 wallet and refresh the page.</Fragment>;
+    const wrongNetworkHTML = <Fragment>You are on the wrong network. Please switch to mainnet on your web3 wallet and refresh the page.<br /><br/></Fragment>;
 
     const offlineHTML = <Fragment>
     [In order to mint an NFT, you need to  have a web3/Ethereum-enabled browser and connect it (see top right of the page). Please download
@@ -34,11 +34,15 @@ function IntroPage(props) {
 
     function mintDeluxeNFT() {
       console.log('minting deluxe NFT');
+      setDisplaySection('');
+      setTypeMinted('deluxe');
       props.mintDeluxeNFT();
     }
 
     function mintNFT() {
       console.log('minting NFT');
+      setDisplaySection('');
+      setTypeMinted('default');
       props.mintNFT();
     }
 
@@ -84,13 +88,13 @@ function IntroPage(props) {
               </Button>
               <br />
               <br />
-              Thanks to your loyalty, you are eligible to claim a free daisychain! Thank you for the support! (You've already claimed a free capsule). <br />
+              Thanks to your loyalty, you are eligible to claim a free daisychain! Thank you for the support! (You've already claimed a free Daisychain). <br />
               </Fragment>
               }
           }
 
           let mintButton;
-          let disabledDeluxeMint = false;
+          let disabledDeluxeMint = disabled;
           // todo: automatically enable if sold out?
           mintButton = <Button type="primary" size={"medium"} disabled={disabledDeluxeMint} loading={props.minting} onClick={mintDeluxeNFT}>
             Mint Deluxe Daisychain (0.055 ETH)
@@ -100,7 +104,7 @@ function IntroPage(props) {
             {displaySection}
             <h3>[] Deluxe Generative Daisychains</h3>
             Limited supply! First come, first serve. 96 are buyable (0.055 ETH. ~$100).<br />
-            They are animated and rotate.<br />
+            They are animated and rotate (click to animate!).<br />
             <br />
             {mintButton}
             <br />
@@ -138,11 +142,15 @@ function IntroPage(props) {
 
     useEffect(() => {
       if(props.mintedSVG !== null) {
+        let header = <h2>Your new Default Daisychain has been minted!</h2>;
+        if(typeMinted === 'deluxe') {
+          header = <h2>Your new Deluxe Daisychain has been minted! Click center to rotate!</h2>;
+        }
         setDisplaySection(
           <Fragment>
-            <h2>Your new Daisychain has been minted!</h2>
-            <CellsComponent svg={props.mintedSVG} /> <br />
-            To interact with the NFT: to view it, to transfer it, and to see other NFTs, head to <a href="https://opensea.io/collection/capsules-of-all-our-lives" target="_blank">OpenSea</a>. 
+            {header}
+            <CellsComponent svg={props.mintedSVG}/> <br />
+            To interact with the NFT: to view it, to transfer it, and to see other NFTs, head to <a href="https://opensea.io/collection/daisychains-life-in-every-breath" target="_blank">OpenSea</a>. 
             It's a platform to view and interact with NFTs, including the Daisychains. It will be in your profile. 
             If you choose to mint another, new Daisychain, it will update to display your new one. All Daisychains, however, are recorded forever
             on the Ethereum blockchain, and viewable in OpenSea.<br />
@@ -176,7 +184,7 @@ function IntroPage(props) {
         The components that make up the Daisychains are licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Thus, you are free to use the NFTs as you wish. <a href="https://github.com/Untitled-Frontier/ug">The code is available on Github.</a>
         <br />
         <br />
-        You can view already minted "Daisychains" on <a href="https://opensea.io/collection/capsules-of-all-our-lives" target="_blank">OpenSea</a>.
+        You can view already minted "Daisychains" on <a href="https://opensea.io/collection/daisychains-life-in-every-breath" target="_blank">OpenSea</a>.
         <br />
         <br />
         <h2> [] MS-OS </h2>

@@ -29,7 +29,7 @@ module.exports = {
       accounts: [deployAccounts[0].privateKey],
     },
     sepolia: {
-      url: `https://rpc.sepolia.dev`,
+      url: `https://sepolia.infura.io/v3/${infuraID}`,
       accounts: [deployAccounts[0].privateKey],
     }
   },

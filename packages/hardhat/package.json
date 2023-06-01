@@ -1,5 +1,5 @@
 {
-  "name": "@capsules/hardhat",
+  "name": "@daisychains/hardhat",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -31,10 +31,9 @@
     "deploy_sepolia": "hardhat run --network sepolia scripts/deploy_sepolia.js",
     "deploy_mainnet": "hardhat run --network mainnet scripts/deploy_mainnet.js",
     "generate_merkle_root": "hardhat run scripts/generate_merkle_root.js",
-    "generate_trait_stats": "hardhat run scripts/generate_trait_stats.mjs",
     "publish_contracts": "hardhat run scripts/publish.js",
     "set_testnet_balance": "hardhat run scripts/set_testnet_balance.js",
     "test": "hardhat test",
-    "verify": "hardhat verify --network mainnet 0xa6Fd332BD26228Fd88868Ae9a7B512519008B72b 'Capsules of All Our Lives' 'COAOL' '0xF4fA7e95d8F115208841e97794a007997645f7C7' '1664805600' '1667224800' '0x7cc8028ca29b9825ff9247ea9ae162aefe188b90b2f671ff19850eb54e9d45df'"
+    "verify": "hardhat verify --network mainnet 0x0e4447aece6d71062c14815f0fc557f29a62fa19 'Daisychains: Life In Every Breath' 'DLIEB' '0x0EC164CADBb42f366D65E9dfd056c0cC2BAB02a9' '1685973600' '1688392800' '0x229a0cd93a0a86f16a4242a128016c6fc47160634db4821f019673cc3f13e64c'"
   }
 }
