@@ -72,7 +72,7 @@ function IntroPage(props) {
           if(inTree) {
             claimHTML = <Fragment>
               <br />
-              <Button type="primary" size={"medium"} disabled={false} loading={props.minting} onClick={claim}>
+              <Button type="primary" size={"medium"} disabled={disabled} loading={props.minting} onClick={claim}>
                 Claim Your Deluxe Daisychain. (Free)
               </Button>
               <br />
