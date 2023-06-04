@@ -72,14 +72,14 @@ function IntroPage(props) {
           if(inTree) {
             claimHTML = <Fragment>
               <br />
-              <Button type="primary" size={"medium"} disabled={disabled} loading={props.minting} onClick={claim}>
+              <Button type="primary" size={"medium"} disabled={false} loading={props.minting} onClick={claim}>
                 Claim Your Deluxe Daisychain. (Free)
               </Button>
               <br />
               <br />
-              Thanks to your loyalty, you are eligible to claim a free daisychain! Thank you for the support! <br />
+              Thanks to your loyalty, you are eligible to claim one free daisychain whenever you want! Thank you for the support! <br />
               </Fragment>
-
+ 
               if(props.alreadyClaimed == true) {
                 claimHTML = <Fragment>
                   <br />
@@ -88,7 +88,7 @@ function IntroPage(props) {
               </Button>
               <br />
               <br />
-              Thanks to your loyalty, you are eligible to claim a free daisychain! Thank you for the support! (You've already claimed a free Daisychain). <br />
+              Thanks to your loyalty, you are eligible to claim one free daisychain whenever you want! Thank you for the support! (You've already claimed a free Daisychain). <br />
               </Fragment>
               }
           }
@@ -177,7 +177,7 @@ function IntroPage(props) {
         <br />
         <br />
         The collection is divided into two variations: a limited supply, deluxe Daisychain, and an open edition default Daisychain. The deluxe Daisychains rotate and are sold as first come, first serve.
-        To be eligible to claim a deluxe Daisychain for free, you would have had to have owned an NFT from all the previous 4 Logged Universe stories combined by {snapshotDate}.
+        To be eligible to claim a deluxe Daisychain for free, you would have had to have owned an NFT from all the previous 4 Logged Universe stories combined by {snapshotDate}. You can claim it any time during the campaign.
         After the campaign period, no new Daisychains can be minted or claimed. The deluxe Daisychains are best viewed on a browser that supports hardware rendering (eg, Chrome or Brave).
         <br />
         <br />
