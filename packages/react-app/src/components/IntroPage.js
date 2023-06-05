@@ -172,7 +172,7 @@ function IntroPage(props) {
         {mintSection}
         </div>
         <h2>[] DETAILS </h2>
-        Each Daisychain contains 32 different randomly generated variables that inform and change its appearance. Each Daisychain is thus unique, lending itself to different, striking variations of colour, shapes, and patterns. 
+        Each Daisychain contains more than 30 different randomly generated variables that inform and change its appearance. Each Daisychain is thus unique, lending itself to different, striking variations of colour, shapes, and patterns. 
         It's all onchain, generated through SVG and thus will exist as long as Ethereum does.
         <br />
         <br />
@@ -181,7 +181,7 @@ function IntroPage(props) {
         After the campaign period, no new Daisychains can be minted or claimed. The deluxe Daisychains are best viewed on a browser that supports hardware rendering (eg, Chrome or Brave).
         <br />
         <br />
-        The components that make up the Daisychains are licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Thus, you are free to use the NFTs as you wish. <a href="https://github.com/Untitled-Frontier/ug">The code is available on Github.</a>
+        The components that make up the Daisychains are licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Thus, you are free to use the NFTs as you wish. <a href="https://github.com/Untitled-Frontier/msos">The code is available on Github.</a>
         <br />
         <br />
         You can view already minted "Daisychains" on <a href="https://opensea.io/collection/daisychains-life-in-every-breath" target="_blank">OpenSea</a>.
