@@ -48,6 +48,8 @@ function IntroPage(props) {
 
     function claim() {
       console.log("claim!");
+      setDisplaySection('');
+      setTypeMinted('deluxe');
       props.claim(props.tree.getHexProof(keccak256(props.address)));
     }
 
